@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//set la vista por default al Login
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes();
