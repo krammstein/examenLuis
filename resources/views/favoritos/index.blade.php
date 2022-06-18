@@ -20,7 +20,7 @@
                 </thead>
 
                 <tbody>
-                    @if (count($items))
+                    @if (count($items) > 0)
                         
                     @else
                         <tr>

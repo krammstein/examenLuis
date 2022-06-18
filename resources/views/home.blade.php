@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $idTable = 't-'. rand(0,9). rand(0,9). rand(0,9). rand(0,9);
+@endphp
 
 <div class="container">
     <div class="row justify-content-center">
@@ -18,7 +21,7 @@
                 </div>
             </div>
             
-            <table class="table">
+            <table class="table" id="{{$idTable}}" style="background: #f2f2f2;">
                 <tbody>
 
                     <thead>
@@ -64,7 +67,7 @@
 
                                 <td>
                                     
-                                    <form action="" method="post">
+                                    <form action="" method="post" class="form-add-fav">
                                         @csrf
                                         <input type="hidden" name="spotify_id" value="{{ $track->id }}" />
                                         <input type="hidden" name="cancion" value="{{ $track->name}}" />
@@ -72,7 +75,14 @@
                                         <input type="hidden" name="album" value="{{ $track->album->name}}" />
                                         <input type="hidden" name="artista" value="{{ $track->artists[0]->name }}" />
 
-                                        <button type="submit" class="btn btn-info">Agregar a Favoritos</button>
+                                        <textarea name="nota" placeholder="Comentarios..." class="form-control d-none f-note" rows="3" autofocus required></textarea>
+
+                                        <button type="button" class="btn btn-success btn-add-fav mt-2"><i class="fas fa-heart"></i></button>
+
+                                        <button type="submit" class="btn btn-primary btn-save-fav mt-2 d-none" disabled>Guardar</button>
+
+                                        <button type="button" class="btn btn-secondary btn-cancel-fav d-none mt-2">Cancelar</button>
+
                                     </form>
                                     
                                 </td>
@@ -95,4 +105,67 @@
         </div>
     </div>
 </div>
+
+<script>
+
+    class Add2Fav{
+
+        constructor(){
+            this.table = document.querySelector('#{{$idTable}}');
+            this.forms = this.table.querySelectorAll('.form-add-fav');
+            
+            this.init();
+        }
+
+        init(){
+
+            this.forms.forEach((form) => {
+
+                let btn = form.querySelector('.btn-add-fav');
+                let btnCancel = form.querySelector('.btn-cancel-fav');
+                let tr = form.parentNode.parentNode;
+
+                btn.addEventListener('click', () => {
+                    this.showTextArea(btn, form, btnCancel, tr);
+                });
+
+                btnCancel.addEventListener('click', () => {
+                    this.hideTextArea(btnCancel, form, btn, tr);
+                });
+                
+            });
+        }
+
+        showTextArea(btn, form, btnCancel, tr){
+            let btnSave = form.querySelector('.btn-save-fav');
+            let note = form.querySelector('.f-note');
+            form.querySelector('.btn-cancel-fav').classList.remove('d-none');
+            note.classList.remove('d-none');
+            btnSave.classList.remove('d-none');
+            btnSave.disabled = false;
+            btn.classList.add('d-none');
+            btn.disabled = true;
+            btnCancel.classList.remove('d-none');
+            note.focus();
+            tr.classList.add('table-primary');
+        }
+
+        hideTextArea(btnCancel, form, btn, tr){
+            let btnSave = form.querySelector('.btn-save-fav');
+            let note = form.querySelector('.f-note');
+            btnCancel.classList.add('d-none');
+            btnSave.classList.add('d-none');
+            btnSave.disabled = true;
+            note.classList.add('d-none');
+            note.value = '';
+            btn.disabled = false;
+            btn.classList.remove('d-none');
+            tr.classList.remove('table-primary');
+        }
+
+    }
+
+    const add = new Add2Fav;
+
+</script>
 @endsection

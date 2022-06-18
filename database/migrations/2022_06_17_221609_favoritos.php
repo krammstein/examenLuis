@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
+        
         Schema::create('favoritos', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned();
@@ -35,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('favoritos');
     }
 };
