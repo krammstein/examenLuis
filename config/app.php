@@ -217,4 +217,8 @@ return [
      */
     'spotify_uri_token' => 'https://accounts.spotify.com/api/token',
 
+    'spotify_uri_search' => 'https://api.spotify.com/v1/search',
+
+    'spotify_limit' => 20,
+
 ];
