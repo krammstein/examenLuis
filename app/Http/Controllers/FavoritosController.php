@@ -24,7 +24,22 @@ class FavoritosController extends Controller
         ]);
     }
 
-    public function create(Request $req){
+    public function add(Request $req){
+        
+        $f = new Favorito;
+        $f->user_id = (int)auth()->user()->id;
+        $f->spotify_id = $req->spotify_id;
+        $f->cancion = $req->cancion;
+        $f->url = $req->url;
+        $f->album = $req->album;
+        $f->artista = $req->artista;
+        $f->nota = $req->nota;
+        $f->created_at = now();
+        $f->updated_at = null;
+        $f->save();
 
+        return json_encode([
+            'resp' => 1,
+        ]);
     }
 }

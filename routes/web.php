@@ -28,4 +28,6 @@ Route::post('/buscar', [HomeController::class, 'buscar'])->name('buscar');
 
 Route::controller(FavoritosController::class)->group(function () {
     Route::get('/favoritos/index', 'index')->name('favoritos.index');
+    Route::post('/favoritos/add', 'add')->name('favoritos.add');
+    Route::delete('/favoritos/remove', 'remove')->name('favoritos.remove');
 });

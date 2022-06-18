@@ -121,51 +121,85 @@
 
             this.forms.forEach((form) => {
 
-                let btn = form.querySelector('.btn-add-fav');
-                let btnCancel = form.querySelector('.btn-cancel-fav');
-                let tr = form.parentNode.parentNode;
-
-                btn.addEventListener('click', () => {
-                    this.showTextArea(btn, form, btnCancel, tr);
+                let obj = {
+                    btn: form.querySelector('.btn-add-fav'),
+                    btnCancel: form.querySelector('.btn-cancel-fav'),
+                    btnSave: form.querySelector('.btn-save-fav'),
+                    tr: form.parentNode.parentNode,
+                    note: form.querySelector('.f-note'),
+                };
+                
+                obj.btn.addEventListener('click', () => {
+                    this.showTextArea(obj);
                 });
 
-                btnCancel.addEventListener('click', () => {
-                    this.hideTextArea(btnCancel, form, btn, tr);
+                obj.btnCancel.addEventListener('click', () => {
+                    this.hideTextArea(obj);
+                });
+
+                obj.btnSave.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.save(form, obj);
                 });
                 
             });
         }
 
-        showTextArea(btn, form, btnCancel, tr){
-            let btnSave = form.querySelector('.btn-save-fav');
-            let note = form.querySelector('.f-note');
-            form.querySelector('.btn-cancel-fav').classList.remove('d-none');
-            note.classList.remove('d-none');
-            btnSave.classList.remove('d-none');
-            btnSave.disabled = false;
-            btn.classList.add('d-none');
-            btn.disabled = true;
-            btnCancel.classList.remove('d-none');
-            note.focus();
-            tr.classList.add('table-primary');
+        showTextArea(obj){
+            
+            obj.btnCancel.classList.remove('d-none');
+            obj.note.classList.remove('d-none');
+            obj.btnSave.classList.remove('d-none');
+            obj.btnSave.disabled = false;
+            obj.btn.classList.add('d-none');
+            obj.btn.disabled = true;
+            obj.btnCancel.classList.remove('d-none');
+            obj.note.focus();
+            obj.tr.classList.add('table-primary');
         }
 
-        hideTextArea(btnCancel, form, btn, tr){
-            let btnSave = form.querySelector('.btn-save-fav');
-            let note = form.querySelector('.f-note');
-            btnCancel.classList.add('d-none');
-            btnSave.classList.add('d-none');
-            btnSave.disabled = true;
-            note.classList.add('d-none');
-            note.value = '';
-            btn.disabled = false;
-            btn.classList.remove('d-none');
-            tr.classList.remove('table-primary');
+        hideTextArea(obj){
+            
+            obj.btnCancel.classList.add('d-none');
+            obj.btnSave.classList.add('d-none');
+            obj.btnSave.disabled = true;
+            obj.note.classList.add('d-none');
+            obj.note.value = '';
+            obj.btn.disabled = false;
+            obj.btn.classList.remove('d-none');
+            obj.tr.classList.remove('table-primary');
+        }
+
+        async save(form, obj){
+
+            obj.btnSave.innerHTML = '<i class="fas fa-cog fa-spin fa-lg"></i>';
+            obj.btnSave.disabled = true;
+
+            let data = new FormData(form);
+
+            let resp = await fetch(
+                '{{ route('favoritos.add') }}', {
+                method: 'POST',
+                body: data,
+            });
+
+            let res = await resp.json();
+
+            obj.btnSave.innerHTML = 'Guardar';
+            obj.btnSave.disabled = false;
+
+            if(res.resp == 1){
+                form.innerHTML = '<div><i class="fas fa-check"></i> Agregado</div>';
+                obj.tr.classList.remove('table-primary');
+
+            }else{
+                alert(res.error);
+            }
         }
 
     }
 
-    const add = new Add2Fav;
+    const add2fav = new Add2Fav;
 
 </script>
 @endsection
