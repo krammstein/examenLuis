@@ -225,5 +225,7 @@ return [
                               'System of a Down', 'Megadeth', 'one',
                               'raining blood', 'Slayer', 'Nirvana'
                             ],
+    
+    'pagination' => 10,
 
 ];

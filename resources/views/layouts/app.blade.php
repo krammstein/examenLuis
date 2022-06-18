@@ -44,7 +44,7 @@
                             </li>    
 
                             <li class="nav-item">
-                                <a href="{{ route('home') }}" class="nav-link">
+                                <a href="{{ route('favoritos.index') }}" class="nav-link">
                                     Mis Favoritos
                                 </a>
                             </li>    

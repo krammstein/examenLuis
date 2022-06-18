@@ -31,7 +31,11 @@
                         </tr>
                     </thead>
 
-                    @if (isset($tracks) and count($tracks) )
+                    @php
+                        $numItems = count($tracks);
+                    @endphp
+
+                    @if (isset($tracks) and $numItems )
                         
                         @foreach ($tracks as $i => $track)
                             
@@ -62,7 +66,7 @@
                                     
                                     <form action="" method="post">
                                         @csrf
-                                        <input type="hidden" name="id" value="{{ $track->id }}" />
+                                        <input type="hidden" name="spotify_id" value="{{ $track->id }}" />
                                         <input type="hidden" name="cancion" value="{{ $track->name}}" />
                                         <input type="hidden" name="url" value="{{ $track->external_urls->spotify }}" />
                                         <input type="hidden" name="album" value="{{ $track->album->name}}" />
@@ -77,11 +81,16 @@
                         @endforeach
 
                     @else
-                        
+                        <tr>
+                            <td colspan="5" class="text-center">No se econtraron canciones</td>
+                        </tr>
                     @endif
                     
                 </tbody>
+                
             </table>
+            <hr/>
+            <p class="lead">Encontrados: {{ $numItems }} de {{$total}} </p>
 
         </div>
     </div>
