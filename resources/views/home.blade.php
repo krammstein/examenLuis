@@ -11,7 +11,9 @@
             <div class="col-md-6 col-12">
                 <div class="row">
                     <div class="col">
-                        @include('buscador')
+                        @include('buscador', [
+                            'busqueda' => isset($busqueda) ? $busqueda : null,
+                        ])
                     </div>
                 </div>
             </div>

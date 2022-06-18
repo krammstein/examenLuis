@@ -38,7 +38,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $tracks = $this->getTracks();
+        $artists = config('app.spotify_init_artists');
+
+        $tracks = $this->getTracks(config('app.spotify_limit'), 0, $artists[rand(0, count($artists) - 1)] );
 
         return view('home', [
             'tracks' => $tracks,
@@ -49,8 +51,16 @@ class HomeController extends Controller
 
     public function buscar(Request $req) {
 
-        return redirect()->route('home', [
-            'items' => [],
+        $tracks = $this->getTracks(
+            config('app.spotify_limit'), 
+            (int)$req->offset, 
+            (string)$req->busqueda);
+
+        return view('home', [
+            'tracks' => $tracks,
+            'total' => $this->total,
+            'offset' => $this->offset,
+            'busqueda' => (string)$req->busqueda,
         ]);
     }
 

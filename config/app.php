@@ -219,6 +219,11 @@ return [
 
     'spotify_uri_search' => 'https://api.spotify.com/v1/search',
 
-    'spotify_limit' => 20,
+    'spotify_limit' => 10,
+
+    'spotify_init_artists' => ['Rammstein', 'Metallica', 'Korn', 
+                              'System of a Down', 'Megadeth', 'one',
+                              'raining blood', 'Slayer', 'Nirvana'
+                            ],
 
 ];
