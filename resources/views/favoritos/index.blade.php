@@ -23,50 +23,52 @@
                 <tbody>
                     @if (count($items) > 0)
 
-                    @foreach ($items as $item)
+                        @foreach ($items as $item)
 
-                        <tr>
+                            <tr>
 
-                            <td class="d-flex justify-content-start">
+                                <td class="d-flex justify-content-start">
 
-                                <form action="{{ route('favoritos.remove') }}" method="post" class="me-1">
-                                    @csrf
-                                    @method('delete')
-                                    <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i></button>
-                                </form>
+                                    <form action="{{ route('favoritos.remove') }}" method="post" class="me-1">
+                                        @csrf
+                                        @method('delete')
+                                        <input type="hidden" name="serial" value="{{ $item->getSerial() }}" />
 
-                                <button class="btn btn-warning btn-edit-nota" type="button"><i class="far fa-edit"></i></button>
-                                
-                            </td>
+                                        <button class="btn btn-danger btn-rem-fav" type="submit"><i class="fas fa-trash"></i></button>
+                                    </form>
 
-                            <td>
-                                <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer">
-                                    {{ $item->cancion }}
-                                </a>
-                            </td>
-
-                            <td>{{ $item->artista }}</td>
-                            <td>{{ $item->album }}</td>
-
-                            <td class="nota-col">
-
-                                <p class="nota-text">{{ $item->nota }}</p>
-
-                                <form action="" method="post" class="nota-form d-none">
-                                    @csrf
-                                    @method('PUT')
-                                    <input type="hidden" name="serial" value="{{ $item->getSerial() }}" />
-
-                                    <textarea name="nota" rows="3" class="form-control nota-input">{{ $item->nota }}</textarea>
-
-                                    <button class="btn btn-primary btn-save-nota" type="button" disabled>Guardar</button>
-                                    <button type="reset" class="btn btn-secondary btn-cancel-nota">Cancelar</button>
+                                    <button class="btn btn-warning btn-edit-nota" type="button"><i class="far fa-edit"></i></button>
                                     
-                                </form>
-                            </td>
+                                </td>
 
-                        </tr>
-                    @endforeach
+                                <td>
+                                    <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer">
+                                        {{ $item->cancion }}
+                                    </a>
+                                </td>
+
+                                <td>{{ $item->artista }}</td>
+                                <td>{{ $item->album }}</td>
+
+                                <td class="nota-col">
+
+                                    <p class="nota-text">{{ $item->nota }}</p>
+
+                                    <form action="" method="post" class="nota-form d-none">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="serial" value="{{ $item->getSerial() }}" />
+
+                                        <textarea name="nota" rows="3" class="form-control nota-input">{{ $item->nota }}</textarea>
+
+                                        <button class="btn btn-primary btn-save-nota" type="button" disabled>Guardar</button>
+                                        <button type="reset" class="btn btn-secondary btn-cancel-nota">Cancelar</button>
+                                        
+                                    </form>
+                                </td>
+
+                            </tr>
+                        @endforeach
                         
                     @else
                         <tr>
@@ -90,6 +92,7 @@
 
                 this.btnsEdit = document.querySelectorAll('.btn-edit-nota');
                 this.btnsCancel = document.querySelectorAll('.btn-cancel-nota');
+                this.btnsRemFav = document.querySelectorAll('.btn-rem-fav');
 
                 this.init();
             }
@@ -148,6 +151,29 @@
 
                 });
 
+                this.btnsRemFav.forEach((btn) => {
+
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+
+                        Swal.fire({
+                            title: 'Realmente quieres eliminar esta canción?',
+                            showCancelButton: true,
+                            confirmButtonText: 'Borrar',
+                            cancelButtonText: 'Cancelar',
+
+                        }).then((result) => {
+                        
+                            if (result.isConfirmed) {
+
+                                this.remove(btn);
+
+                            }
+
+                        });
+                    });
+                });
+
             }
 
             async save(obj, tr){
@@ -174,6 +200,40 @@
                     obj.notaText.innerHTML = obj.notaInput.value;
                     tr.classList.remove('table-primary');
                     
+                }else{
+
+                    Swal.fire(
+                        'Ocurrieron errores',
+                        res.err.toString(),
+                        'error'
+                    );
+                }
+            }
+
+            async remove(btn){
+
+                let icon = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-cog fa-spin fa-lg"></i>';
+                btn.disabled = true;
+
+                let form = btn.parentNode;
+                let tr = form.parentNode.parentNode;
+                tr.classList.add('table-primary');
+
+                let resp = await fetch('{{ route('favoritos.remove') }}', {
+                    method: "POST",
+                    body: new FormData(form),
+                });
+
+                let res = await resp.json();
+
+                btn.innerHTML = icon;
+                btn.disabled = false;
+
+                if(res.resp == 1){
+
+                    tr.remove();
+
                 }else{
 
                     Swal.fire(

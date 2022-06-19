@@ -69,7 +69,33 @@ class FavoritosController extends Controller
     }
 
     public function remove(Request $req){
+        $resp = 0;
+        $err = [];
 
+        $id = (int)Crypt::decryptString($req->serial);
+
+        if ($id > 0) {
+
+            $item = Favorito::where('id', $id)->first();
+
+            if (isset($item->id)) {
+
+                $item->delete();
+                $resp = 1;
+                
+            } else {
+
+                $err = ['Esta canción no existe'];
+            }
+
+        }else{
+            $err = ['Esta canción no es válida'];
+        }
+
+        return json_encode([
+            'resp' => $resp,
+            'err' => $err,
+        ]);
     }
 
     public function modify(Request $req){
