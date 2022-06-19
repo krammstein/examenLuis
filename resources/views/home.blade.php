@@ -193,7 +193,12 @@
                 obj.tr.classList.remove('table-primary');
 
             }else{
-                alert(res.error);
+
+                Swal.fire(
+                'Ocurrieron errores',
+                res.err.toString(),
+                'error'
+                );
             }
         }
 

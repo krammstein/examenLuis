@@ -24,7 +24,9 @@
                     @if (count($items) > 0)
 
                     @foreach ($items as $item)
+
                         <tr>
+
                             <td class="d-flex justify-content-start">
 
                                 <form action="{{ route('favoritos.remove') }}" method="post" class="me-1">
@@ -33,7 +35,7 @@
                                     <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i></button>
                                 </form>
 
-                                <button class="btn btn-warning" type="button"><i class="far fa-edit"></i></button>
+                                <button class="btn btn-warning btn-edit-nota" type="button"><i class="far fa-edit"></i></button>
                                 
                             </td>
 
@@ -45,7 +47,24 @@
 
                             <td>{{ $item->artista }}</td>
                             <td>{{ $item->album }}</td>
-                            <td>{{ $item->nota }}</td>
+
+                            <td class="nota-col">
+
+                                <p class="nota-text">{{ $item->nota }}</p>
+
+                                <form action="" method="post" class="nota-form d-none">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="serial" value="{{ $item->getSerial() }}" />
+
+                                    <textarea name="nota" rows="3" class="form-control nota-input">{{ $item->nota }}</textarea>
+
+                                    <button class="btn btn-primary btn-save-nota" type="button" disabled>Guardar</button>
+                                    <button type="reset" class="btn btn-secondary btn-cancel-nota">Cancelar</button>
+                                    
+                                </form>
+                            </td>
+
                         </tr>
                     @endforeach
                         
@@ -63,5 +82,111 @@
         </div>
     </div>
 
+    <script>
+
+        class FavoritosTable{
+
+            constructor(){
+
+                this.btnsEdit = document.querySelectorAll('.btn-edit-nota');
+                this.btnsCancel = document.querySelectorAll('.btn-cancel-nota');
+
+                this.init();
+            }
+
+            init(){
+
+                this.btnsEdit.forEach((btn) => {
+
+                    let tr = btn.parentNode.parentNode;
+                    
+                    btn.addEventListener('click', () => {
+
+                        tr.classList.add('table-primary');
+
+                        let col = tr.querySelector('.nota-col');
+
+                        let obj = {
+                            notaForm: col.querySelector('.nota-form'),
+                            notaText: col.querySelector('.nota-text'),
+                            notaInput: col.querySelector('.nota-input'),
+                            btnSave: col.querySelector('.btn-save-nota'),
+                        };
+                        
+                        obj.notaForm.classList.remove('d-none');
+                        obj.notaText.classList.add('d-none');
+                        obj.btnSave.disabled = false;
+                        obj.notaInput.focus();
+
+                        obj.btnSave.addEventListener('click', () => {
+                            this.save(obj, tr);
+                        });
+
+                    });
+
+                });
+
+                this.btnsCancel.forEach((btn) => {
+
+                    let tr = btn.parentNode.parentNode.parentNode;
+
+                    btn.addEventListener('click', () => {
+
+                        tr.classList.remove('table-primary');
+
+                        let col = tr.querySelector('.nota-col');
+                        
+                        let notaForm = col.querySelector('.nota-form');
+                        let notaText = col.querySelector('.nota-text');
+                        let btnSave = col.querySelector('.btn-save-nota');
+                        
+                        notaForm.classList.add('d-none');
+                        notaText.classList.remove('d-none');
+                        btnSave.disabled = true;
+                        
+                    });
+
+                });
+
+            }
+
+            async save(obj, tr){
+
+                obj.btnSave.innerHTML = '<i class="fas fa-cog fa-spin fa-lg"></i>';
+                obj.btnSave.disabled = true;
+
+                let data = new FormData(obj.notaForm);
+                
+                let resp = await fetch('{{ route('favoritos.modify') }}', {
+                    method: "POST",
+                    body: data,
+                });
+
+                let res = await resp.json();
+
+                obj.btnSave.innerHTML = 'Guardar';
+                obj.btnSave.disabled = false;
+
+                if(res.resp == 1){
+
+                    obj.notaForm.classList.add('d-none');
+                    obj.notaText.classList.remove('d-none');
+                    obj.notaText.innerHTML = obj.notaInput.value;
+                    tr.classList.remove('table-primary');
+                    
+                }else{
+
+                    Swal.fire(
+                        'Ocurrieron errores',
+                        res.err.toString(),
+                        'error'
+                    );
+                }
+            }
+        }
+
+        const favtab = new FavoritosTable;
+
+    </script>
     
 @endsection
